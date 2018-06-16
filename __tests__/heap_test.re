@@ -25,9 +25,9 @@ describe("Heap", () => {
         let e9 = Heap.extract_min(heap);
 
         expect((e1, e2, e3, e4, e5, e6, e7, e8, e9)) |> toEqual((
-            Some("1"), Some("2"), Some("3"),
-            Some("4"), Some("5"), Some("6"),
-            Some("7"), Some("8"), Some("9")
+            Some((1, "1")), Some((2, "2")), Some((3, "3")),
+            Some((4, "4")), Some((5, "5")), Some((6, "6")),
+            Some((7, "7")), Some((8, "8")), Some((9, "9"))
         ));
     });
 });

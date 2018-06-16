@@ -3,6 +3,8 @@ type heapElement('a, 'b) = {
     value: 'b
 };
 
+let to_tuple = element => (element.key, element.value);
+
 type heap('a, 'b) = {
     memo: ref(array(heapElement('a, 'b))),
     compare: ('a, 'a) => bool 
@@ -80,18 +82,18 @@ let extract_min = heap => {
     switch heap_size {
     | 0 => None
     | 1 => {
-        let value = Array.get(memo, 0).value;
+        let temp = Array.get(memo, 0);
         heap.memo := [||];
-        Some(value);
+        Some(to_tuple(temp));
     }
     | _ => {
-        let value = Array.get(memo, 0).value;
+        let temp = Array.get(memo, 0);
         let memo = Array.copy(memo);
         swap(memo, 0, heap_size - 1);
         let memo = Array.sub(memo, 0, heap_size - 1);
         min_heapify(memo, 0, heap.compare);
         heap.memo := memo;
-        Some(value);
+        Some(to_tuple(temp));
     }
     };
 }
@@ -107,7 +109,7 @@ let min = heap => {
     let heap_size = Array.length(heap.memo^);
     switch (heap_size) {
     | 0 => None
-    | _ => Some(Array.get(heap.memo^, 0).value)
+    | _ => Some(to_tuple(Array.get(heap.memo^, 0)))
     };
 }
 
