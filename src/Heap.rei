@@ -1,6 +1,12 @@
-type heap('a, 'b);
-let make: (~key: 'a, ~value: 'b, ~comparator: ('a, 'a) => bool) => heap('a, 'b);
-let insert: (heap('a, 'b), 'a, 'b) => unit;
-let extract_min: heap('a, 'b) => option(('a, 'b));
-let min: heap('a, 'b) => option(('a, 'b));
-let inspect: heap('a, 'b) => unit;
+type heapElement('a, 'b) = {
+    key: 'a,
+    value: 'b
+}
+type t('a, 'b);
+exception EmptyQueue;
+let create: (('a, 'a) => bool) => t('a, 'b);
+let add: ('a, 'b, t('a, 'b)) => unit;
+let extract_min: t('a, 'b) => heapElement('a, 'b);
+let min: t('a, 'b) => heapElement('a, 'b);
+let size: t('a, 'b) => int;
+let inspect: t('a, 'b) => string;

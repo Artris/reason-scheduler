@@ -1,21 +1,19 @@
 type heapElement('a, 'b) = {
     key: 'a,
     value: 'b
-};
+}
 
-let to_tuple = element => (element.key, element.value);
-
-type heap('a, 'b) = {
-    memo: ref(array(heapElement('a, 'b))),
+type t('a, 'b) = {
+    memo: ref(option(array(heapElement('a, 'b)))),
     compare: ('a, 'a) => bool 
 };
 
-let make = (~key, ~value, ~comparator) => {
-    {
-        memo: ref(Array.make(1, {key: key, value: value})),
-        compare: comparator
-    }
-}
+exception EmptyQueue;
+
+let create = compare => {
+    memo: ref(None),
+    compare: compare
+};
 
 let parent = 
     fun
@@ -25,18 +23,18 @@ let parent =
 let left = index => 2 * index + 1;
 let right = index => 2 * (index + 1);
 
-let key = (memo, index) => Array.get(memo, index).key;
-
-let swap = (memo, a, b) => {
-    let a' = Array.get(memo, a);
-    let b' = Array.get(memo, b);
-    Array.set(memo, a, b');
-    Array.set(memo, b, a');
+let swap = (a, b, queue) => {
+    let a' = Array.get(queue, a);
+    let b' = Array.get(queue, b);
+    Array.set(queue, a, b');
+    Array.set(queue, b, a');
 }
 
-let rec min_heapify = (memo, index, compare) => {
-    let key = key(memo);
-    let heap_size = Array.length(memo);
+let key = (queue, index) => Array.get(queue, index).key;
+
+let rec min_heapify = (index, compare, queue) => {
+    let key = key(queue);
+    let heap_size = Array.length(queue);
     let left_index = left(index);
     let right_index = right(index);
 
@@ -51,66 +49,75 @@ let rec min_heapify = (memo, index, compare) => {
     
     let min_index = min_index^;
     if(min_index != index){
-        swap(memo, min_index, index);
-        min_heapify(memo, min_index, compare);
+        swap(min_index, index, queue);
+        min_heapify(min_index, compare, queue);
     }
 }
 
-let rec fix_up = (memo, index) => {
-    let key = key(memo);
+let rec fix_up = (index, queue) => {
+    let key = key(queue);
     let parent_index = parent(index);
 
     switch parent_index {
-    | Some(parent_index) when key(index) < key(parent_index) => {
-        swap(memo, index, parent_index);
-        fix_up(memo, parent_index);
+    | Some(p_ind) when key(index) < key(p_ind) => {
+        swap(index, p_ind, queue);
+        fix_up(p_ind, queue);
     }
     | _ => () 
     };
 }
 
-let fix_last = memo => {
-    let heap_size = Array.length(memo);
-    if(heap_size > 0){
-        fix_up(memo, heap_size - 1);
-    }
+let fix_last = queue => {
+    let heap_size = Array.length(queue);
+    fix_up(heap_size - 1, queue);
 }
 
 let extract_min = heap => {
-    let memo = heap.memo^;
-    let heap_size = Array.length(memo);
-    switch heap_size {
-    | 0 => None
-    | 1 => {
-        let temp = Array.get(memo, 0);
-        heap.memo := [||];
-        Some(to_tuple(temp));
+    switch heap.memo^ {
+    | Some(q) when 1 == Array.length(q) => {
+        let head = Array.get(q, 0);
+        heap.memo := Some([||]);
+        head;
     }
-    | _ => {
-        let temp = Array.get(memo, 0);
-        let memo = Array.copy(memo);
-        swap(memo, 0, heap_size - 1);
-        let memo = Array.sub(memo, 0, heap_size - 1);
-        min_heapify(memo, 0, heap.compare);
-        heap.memo := memo;
-        Some(to_tuple(temp));
+    | Some(q) when 1 < Array.length(q) => {
+        let heap_size = Array.length(q);
+        let head = Array.get(q, 0);
+        swap(0, heap_size - 1, q);
+        let q = Array.sub(q, 0, heap_size - 1);
+        min_heapify(0, heap.compare, q);
+        heap.memo := Some(q);
+        head;
     }
+    | _ => raise(EmptyQueue)
     };
 }
 
-let insert = (heap, key, value) => {
-    let element = {key: key, value: value};
-    let memo = Array.append(heap.memo^, [|element|]);
-    fix_last(memo);
-    heap.memo := memo;
+let add = (key, value, heap) => {
+    let queue = switch heap.memo^ {
+    | None => [|{key, value}|]
+    | Some(q) => Array.append(q, [|{key, value}|])
+    };
+    fix_last(queue);
+    heap.memo := Some(queue);
 }
 
 let min = heap => {
-    let heap_size = Array.length(heap.memo^);
-    switch (heap_size) {
-    | 0 => None
-    | _ => Some(to_tuple(Array.get(heap.memo^, 0)))
+    switch heap.memo^ {
+    | Some(q) when 0 < Array.length(q) => Array.get(q, 0)
+    | _ => raise(EmptyQueue)
     };
 }
 
-let inspect = heap => Js.log(heap.memo^);
+let size = heap => {
+    switch heap.memo^ {
+    | None => 0
+    | Some(q) => Array.length(q)
+    };
+}
+
+let inspect = heap => {
+    switch heap.memo^ {
+    | None => "Empty"
+    | Some(q) => Js.Array.toString(q)
+    };
+}
