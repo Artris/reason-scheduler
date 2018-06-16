@@ -1,6 +1,6 @@
-type heap('a);
-let make: (int, 'a) => heap('a);
-let insert: (heap('a), int, 'a) => heap('a);
-let extract_min: heap('a) => (option('a), heap('a));
-let min: heap('a) => option('a);
-let inspect: heap('a) => unit;
+type heap('a, 'b);
+let make: (~key: 'a, ~value: 'b, ~comparator: ('a, 'a) => bool) => heap('a, 'b);
+let insert: (heap('a, 'b), 'a, 'b) => unit;
+let extract_min: heap('a, 'b) => option('b);
+let min: heap('a, 'b) => option('b);
+let inspect: heap('a, 'b) => unit;
