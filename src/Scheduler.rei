@@ -10,5 +10,7 @@ type job = {
 
 type scheduler;
 
-let make: job => scheduler;
-let create: (scheduler, job) => unit
+exception EmptyQueue;
+
+let create: unit => scheduler;
+let add: (scheduler, job) => unit

@@ -19,11 +19,11 @@ type job = {
 };
 
 type scheduler = {
-  queue: Heap.heap(long, job),
-  timer: ref(timerId)
+  queue: Heap.t(long, job),
+  timer: ref(option(timerId))
 };
 
-exception EmptyHeap;
+exception EmptyQueue;
 
 let wait = period => {
   switch period {
@@ -39,48 +39,48 @@ let next_invokation = job => {
 }
 
 let rec execute = scheduler => () => {
-  let head = Heap.extract_min(scheduler.queue);
-  let job = switch head {
-  | Some((_, job)) => job
-  | _ => raise(EmptyHeap)
-  };
+  let job = Heap.extract_min(scheduler.queue).value; 
   let new_key = next_invokation(job);
-  Heap.insert(scheduler.queue, new_key, job);
+  Heap.add(new_key, job, scheduler.queue);
 
-  let head = Heap.min(scheduler.queue);
-  let (key, job) = switch head {
-  | Some(element) => element
-  | _ => raise(EmptyHeap)
-  };
-
+  let key = Heap.min(scheduler.queue).key;
   let timeout = subtract(key, time_now());
   let timer_id = setTimeout(execute(scheduler), timeout);
-  scheduler.timer := timer_id;
+  scheduler.timer := Some(timer_id);
   job.invoke(); 
 };
 
-let create = (scheduler, job) => {
-  let next_invokation = next_invokation(job);
-  let head = Heap.min(scheduler.queue);
-  let (key, _) = switch head {
-  | Some(element) => element
-  | _ => raise(EmptyHeap)
-  };
+exception TimerIsMissing;
 
-  Heap.insert(scheduler.queue, next_invokation, job);
-  if(is_greater(key, next_invokation)){
-    clearTimeout(scheduler.timer^);
-    scheduler.timer := setTimeout(execute(scheduler), wait(job.period));
+let add = (scheduler, job) => {
+  let queue = scheduler.queue;
+  let queue_size = Heap.size(queue);
+  let next_invokation = next_invokation(job);
+  let () = switch queue_size {
+  | 0 => {
+    Heap.add(next_invokation, job, queue);
+    let wait = wait(job.period);
+    scheduler.timer := Some(setTimeout(execute(scheduler), wait));
   }
-}
+  | _ => {
+    let key = Heap.min(scheduler.queue).key;
+    Heap.add(next_invokation, job, queue);
+    if(is_greater(key, next_invokation)){
+      let timer_id = switch scheduler.timer^ {
+      | None => raise(TimerIsMissing)
+      | Some(id) => id
+      };
+      clearTimeout(timer_id);
+      let wait = wait(job.period);
+      let timer_id = setTimeout(execute(scheduler), wait);
+      scheduler.timer := Some(timer_id);
+    }
+  }
+  }
 
-let make = job => {
-  let next_invokation = next_invokation(job);
-  let queue = Heap.make(~key= next_invokation, ~value=job, ~comparator=is_greater);
-  let scheduler = {
-    queue: queue,
-    timer: ref(setTimeout(()=>(), 1))
-  };
-  scheduler.timer := setTimeout(execute(scheduler), wait(job.period));
-  scheduler;
-}
+};
+
+let create = () => {
+  queue: Heap.create(is_greater),
+  timer: ref(None)
+};
