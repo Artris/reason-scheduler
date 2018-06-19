@@ -4,14 +4,14 @@ type heapElement('a, 'b) = {
 }
 
 type t('a, 'b) = {
-    memo: ref(array(heapElement('a, 'b))),
+    queue: ref(array(heapElement('a, 'b))),
     compare: ('a, 'a) => bool 
 };
 
 exception EmptyQueue;
 
 let create = compare => {
-    memo: ref([||]),
+    queue: ref([||]),
     compare: compare
 };
 
@@ -73,10 +73,10 @@ let fix_last = queue => {
 }
 
 let extract_min = heap => {
-    switch heap.memo^ {
+    switch heap.queue^ {
     | [||] => raise(EmptyQueue)
     | [|min|] => {
-        heap.memo := [||];
+        heap.queue := [||];
         min;
     }
     | q => {
@@ -85,28 +85,28 @@ let extract_min = heap => {
         swap(0, heap_size - 1, q);
         let q = Array.sub(q, 0, heap_size - 1);
         min_heapify(0, heap.compare, q);
-        heap.memo := q;
+        heap.queue := q;
         head;
     }
     };
 }
 
 let add = (key, value, heap) => {
-    let queue = switch heap.memo^ {
+    let queue = switch heap.queue^ {
     | [||] => [|{key, value}|]
     | q => Array.append(q, [|{key, value}|])
     };
     fix_last(queue);
-    heap.memo := queue;
+    heap.queue := queue;
 }
 
 let min = heap => {
-    switch heap.memo^ {
+    switch heap.queue^ {
     | [||] => raise(EmptyQueue)
     | q => Array.get(q, 0)
     };
 }
 
-let size = heap => Array.length(heap.memo^)
+let size = heap => Array.length(heap.queue^)
 
-let inspect = heap => Js.Array.toString(heap.memo^)
+let inspect = heap => Js.Array.toString(heap.queue^)
