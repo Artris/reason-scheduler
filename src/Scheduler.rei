@@ -8,9 +8,7 @@ type job = {
     invoke: unit => unit
 };
 
-type scheduler;
+type t;
 
-exception EmptyQueue;
-
-let create: unit => scheduler;
-let add: (scheduler, job) => unit
+let create: unit => t;
+let add: (t, job) => unit
