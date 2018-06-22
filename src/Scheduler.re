@@ -37,9 +37,9 @@ let next_invocation = job => {
 }
 
 let rec execute = scheduler => () => {
-  let job = Heap.extract_min(scheduler.queue).value; 
+  let job = Heap.min(scheduler.queue).value; 
   let new_key = next_invocation(job);
-  Heap.add(new_key, job, scheduler.queue);
+  Heap.update_root_key(new_key, scheduler.queue);
 
   let key = Heap.min(scheduler.queue).key;
   let timeout = subtract(key, time_now());
