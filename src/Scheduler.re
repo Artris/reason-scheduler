@@ -8,13 +8,13 @@ let sum: (long, int) => long = [%raw "(a, b) => a + b"];
 let subtract: (long, long) => int = [%raw "(a, b) => a - b"];
 let is_greater: (long, long) => bool = [%raw "(a, b) => a > b"];
 
-type recurrance =
+type recurrence =
   | Second(int)
   | Minute(int)
   | Hour(int);
 
 type job = {
-    period: recurrance,
+    period: recurrence,
     invoke: unit => unit
 };
 
