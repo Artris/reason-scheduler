@@ -4,10 +4,12 @@ type heapElement('a, 'b) = {
 }
 type t('a, 'b);
 exception EmptyQueue;
+exception HasHigherPriority;
+
 let create: (('a, 'a) => bool) => t('a, 'b);
 let add: ('a, 'b, t('a, 'b)) => unit;
 let extract_min: t('a, 'b) => heapElement('a, 'b);
 let min: t('a, 'b) => heapElement('a, 'b);
 let size: t('a, 'b) => int;
-let update_root_key: ('a, t('a, 'b)) => unit
+let decrease_root_priority: ('a, t('a, 'b)) => unit
 let inspect: t('a, 'b) => string;
