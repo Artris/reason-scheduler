@@ -54,22 +54,22 @@ let rec min_heapify = (index, compare, queue) => {
     }
 }
 
-let rec fix_up = (index, queue) => {
+let rec fix_up = (index, compare, queue) => {
     let key = key(queue);
     let parent_index = parent(index);
 
     switch parent_index {
     | Some(p_ind) when key(index) < key(p_ind) => {
         swap(index, p_ind, queue);
-        fix_up(p_ind, queue);
+        fix_up(p_ind, compare, queue);
     }
     | _ => () 
     };
 }
 
-let fix_last = queue => {
+let fix_last = (compare, queue) => {
     let heap_size = Array.length(queue);
-    fix_up(heap_size - 1, queue);
+    fix_up(heap_size - 1, compare, queue);
 }
 
 let extract_min = heap => {
@@ -96,7 +96,7 @@ let add = (key, value, heap) => {
     | [||] => [|{key, value}|]
     | q => Array.append(q, [|{key, value}|])
     };
-    fix_last(queue);
+    fix_last(compare, queue);
     heap.queue := queue;
 }
 
@@ -105,6 +105,20 @@ let min = heap => {
     | [||] => raise(EmptyQueue)
     | q => Array.get(q, 0)
     };
+}
+
+let update_key = (index, next_key, heap) => {
+    let queue = heap.queue^;
+    let current_key = key(queue, index);
+    let value = Array.get(queue, index).value;
+    let is_greater = heap.compare(next_key, current_key);
+    Array.set(queue, index, {key: next_key, value: value});
+    if(is_greater){ min_heapify(index, heap.compare, queue)}
+    else { fix_up(index, heap.compare, queue) }
+}
+
+let update_root_key = (next_key, heap) => {
+    update_key(0, next_key, heap);
 }
 
 let size = heap => Array.length(heap.queue^)
