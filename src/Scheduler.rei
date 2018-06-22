@@ -1,10 +1,10 @@
-type recurrance =
+type recurrence =
   | Second(int)
   | Minute(int)
   | Hour(int);
 
 type job = {
-    period: recurrance,
+    period: recurrence,
     invoke: unit => unit
 };
 
