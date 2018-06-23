@@ -37,11 +37,11 @@ let next_invocation = job => {
 }
 
 let rec execute = scheduler => () => {
-  let job = Heap.min(scheduler.queue).value; 
+  let job = Heap.head(scheduler.queue).value; 
   let new_key = next_invocation(job);
   Heap.decrease_root_priority(new_key, scheduler.queue);
 
-  let key = Heap.min(scheduler.queue).key;
+  let key = Heap.head(scheduler.queue).key;
   let timeout = subtract(key, time_now());
   let timer_id = setTimeout(execute(scheduler), timeout);
   scheduler.timer_id := Some(timer_id);
@@ -61,7 +61,7 @@ let add = (scheduler, job) => {
     scheduler.timer_id := Some(setTimeout(execute(scheduler), wait));
   }
   | _ => {
-    let key = Heap.min(scheduler.queue).key;
+    let key = Heap.head(scheduler.queue).key;
     Heap.add(next_invocation, job, queue);
     if(has_higher_priority(next_invocation, key)){
       let timer_id = switch scheduler.timer_id^ {
