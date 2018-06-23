@@ -32,7 +32,7 @@ let swap = (a, b, queue) => {
 
 let key = (queue, index) => Array.get(queue, index).key;
 
-let rec min_heapify = (index, compare, queue) => {
+let rec heapify = (index, compare, queue) => {
     let key = key(queue);
     let heap_size = Array.length(queue);
     let left_index = left(index);
@@ -52,7 +52,7 @@ let rec min_heapify = (index, compare, queue) => {
     let max_priority_index = max_priority_index^;
     if(max_priority_index != index){
         swap(max_priority_index, index, queue);
-        min_heapify(max_priority_index, compare, queue);
+        heapify(max_priority_index, compare, queue);
     }
 }
 
@@ -86,7 +86,7 @@ let extract_min = heap => {
         let head = Array.get(q, 0);
         swap(0, heap_size - 1, q);
         let q = Array.sub(q, 0, heap_size - 1);
-        min_heapify(0, heap.compare, q);
+        heapify(0, heap.compare, q);
         heap.queue := q;
         head;
     }
@@ -118,7 +118,7 @@ let update_priority = (index, new_priority, heap) => {
     if(has_higher_priority){
         fix_up(index, heap.compare, queue)
     } else {
-        min_heapify(index, heap.compare, queue)
+        heapify(index, heap.compare, queue)
     }
 }
 
