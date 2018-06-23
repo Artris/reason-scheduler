@@ -3,7 +3,7 @@ open Expect;
 
 describe("Heap", () => {  
     test("heap sort", () => {
-        let heap = Heap.create((a, b) => a > b);
+        let heap = Heap.create((a, b) => a < b);
         Heap.add(9, "9", heap);
         Heap.add(8, "8", heap);
         Heap.add(7, "7", heap);

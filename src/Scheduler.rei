@@ -8,6 +8,7 @@ type job = {
     invoke: unit => unit
 };
 
+exception TimerIsMissing;
 type t;
 
 let create: unit => t;

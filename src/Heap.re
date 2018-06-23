@@ -38,19 +38,21 @@ let rec min_heapify = (index, compare, queue) => {
     let left_index = left(index);
     let right_index = right(index);
 
-    let min_index = ref(index);
-    min_index :=
-        if (left_index < heap_size && compare(key(min_index^), key(left_index))){ left_index } 
-        else { min_index^ };
+    let max_priority_index = ref(index);
+    max_priority_index :=
+        if (left_index < heap_size &&
+            compare(key(left_index), key(max_priority_index^))){ left_index } 
+        else { max_priority_index^ };
     
-    min_index :=
-        if (right_index < heap_size && compare(key(min_index^), key(right_index))){ right_index } 
-        else { min_index^ };
+        max_priority_index :=
+        if (right_index < heap_size &&
+            compare(key(right_index), key(max_priority_index^))){ right_index } 
+        else { max_priority_index^ };
     
-    let min_index = min_index^;
-    if(min_index != index){
-        swap(min_index, index, queue);
-        min_heapify(min_index, compare, queue);
+    let max_priority_index = max_priority_index^;
+    if(max_priority_index != index){
+        swap(max_priority_index, index, queue);
+        min_heapify(max_priority_index, compare, queue);
     }
 }
 
@@ -59,7 +61,7 @@ let rec fix_up = (index, compare, queue) => {
     let parent_index = parent(index);
 
     switch parent_index {
-    | Some(p_ind) when key(index) < key(p_ind) => {
+    | Some(p_ind) when compare(key(index), key(p_ind)) => {
         swap(index, p_ind, queue);
         fix_up(p_ind, compare, queue);
     }
@@ -96,7 +98,7 @@ let add = (key, value, heap) => {
     | [||] => [|{key, value}|]
     | q => Array.append(q, [|{key, value}|])
     };
-    fix_last(compare, queue);
+    fix_last(heap.compare, queue);
     heap.queue := queue;
 }
 
@@ -106,21 +108,33 @@ let min = heap => {
     | q => Array.get(q, 0)
     };
 }
-
-let update_key = (index, next_key, heap) => {
+let update_priority = (index, new_priority, heap) => {
     let queue = heap.queue^;
-    let current_key = key(queue, index);
+    let current_priority = key(queue, index);
     let value = Array.get(queue, index).value;
-    let is_greater = heap.compare(next_key, current_key);
-    Array.set(queue, index, {key: next_key, value: value});
-    if(is_greater){ min_heapify(index, heap.compare, queue)}
-    else { fix_up(index, heap.compare, queue) }
+    Array.set(queue, index, {key: new_priority, value: value});
+
+    let has_higher_priority = heap.compare(new_priority, current_priority);
+    if(has_higher_priority){
+        fix_up(index, heap.compare, queue)
+    } else {
+        min_heapify(index, heap.compare, queue)
+    }
 }
 
-let update_root_key = (next_key, heap) => {
-    update_key(0, next_key, heap);
+exception HasHigherPriority;
+
+let decrease_root_priority = (new_priority, heap) => {
+    let queue = heap.queue^;
+    let current_priority = key(queue, 0);
+    let has_higher_priority = heap.compare(new_priority, current_priority);
+    if(has_higher_priority){
+        raise(HasHigherPriority);
+    } else {
+        update_priority(0, new_priority, heap);
+    }
 }
 
-let size = heap => Array.length(heap.queue^)
+let size = heap => Array.length(heap.queue^);
 
-let inspect = heap => Js.Array.toString(heap.queue^)
+let inspect = heap => Js.Array.toString(heap.queue^);

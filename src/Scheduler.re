@@ -6,7 +6,7 @@ type long;
 let time_now: unit => long = [%raw "() => { return new Date().getTime(); }"];
 let sum: (long, int) => long = [%raw "(a, b) => a + b"];
 let subtract: (long, long) => int = [%raw "(a, b) => a - b"];
-let is_greater: (long, long) => bool = [%raw "(a, b) => a > b"];
+let has_higher_priority: (long, long) => bool = [%raw "(a, b) => a < b"];
 
 type recurrence =
   | Second(int)
@@ -39,7 +39,7 @@ let next_invocation = job => {
 let rec execute = scheduler => () => {
   let job = Heap.min(scheduler.queue).value; 
   let new_key = next_invocation(job);
-  Heap.update_root_key(new_key, scheduler.queue);
+  Heap.decrease_root_priority(new_key, scheduler.queue);
 
   let key = Heap.min(scheduler.queue).key;
   let timeout = subtract(key, time_now());
@@ -63,7 +63,7 @@ let add = (scheduler, job) => {
   | _ => {
     let key = Heap.min(scheduler.queue).key;
     Heap.add(next_invocation, job, queue);
-    if(is_greater(key, next_invocation)){
+    if(has_higher_priority(next_invocation, key)){
       let timer_id = switch scheduler.timer_id^ {
       | None => raise(TimerIsMissing)
       | Some(id) => id
@@ -79,6 +79,6 @@ let add = (scheduler, job) => {
 };
 
 let create = () => {
-  queue: Heap.create(is_greater),
+  queue: Heap.create(has_higher_priority),
   timer_id: ref(None)
 };
