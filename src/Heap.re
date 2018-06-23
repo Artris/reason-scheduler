@@ -74,7 +74,7 @@ let fix_last = (compare, queue) => {
     fix_up(heap_size - 1, compare, queue);
 }
 
-let extract_min = heap => {
+let extract = heap => {
     switch heap.queue^ {
     | [||] => raise(EmptyQueue)
     | [|min|] => {

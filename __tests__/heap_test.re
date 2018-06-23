@@ -14,15 +14,15 @@ describe("Heap", () => {
         Heap.add(5, "5", heap);
         Heap.add(4, "4", heap);
 
-        let {value: e1}: Heap.heapElement(int, string) = Heap.extract_min(heap);
-        let {value: e2}: Heap.heapElement(int, string) = Heap.extract_min(heap);
-        let {value: e3}: Heap.heapElement(int, string) = Heap.extract_min(heap);
-        let {value: e4}: Heap.heapElement(int, string) = Heap.extract_min(heap);
-        let {value: e5}: Heap.heapElement(int, string) = Heap.extract_min(heap);
-        let {value: e6}: Heap.heapElement(int, string) = Heap.extract_min(heap);
-        let {value: e7}: Heap.heapElement(int, string) = Heap.extract_min(heap);
-        let {value: e8}: Heap.heapElement(int, string) = Heap.extract_min(heap);
-        let {value: e9}: Heap.heapElement(int, string) = Heap.extract_min(heap);
+        let {value: e1}: Heap.heapElement(int, string) = Heap.extract(heap);
+        let {value: e2}: Heap.heapElement(int, string) = Heap.extract(heap);
+        let {value: e3}: Heap.heapElement(int, string) = Heap.extract(heap);
+        let {value: e4}: Heap.heapElement(int, string) = Heap.extract(heap);
+        let {value: e5}: Heap.heapElement(int, string) = Heap.extract(heap);
+        let {value: e6}: Heap.heapElement(int, string) = Heap.extract(heap);
+        let {value: e7}: Heap.heapElement(int, string) = Heap.extract(heap);
+        let {value: e8}: Heap.heapElement(int, string) = Heap.extract(heap);
+        let {value: e9}: Heap.heapElement(int, string) = Heap.extract(heap);
 
         expect((e1, e2, e3, e4, e5, e6, e7, e8, e9)) |> toEqual(
             ("1", "2", "3", "4", "5", "6", "7", "8", "9"));
