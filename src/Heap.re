@@ -77,9 +77,9 @@ let fix_last = (compare, queue) => {
 let extract = heap => {
     switch heap.queue^ {
     | [||] => raise(EmptyQueue)
-    | [|min|] => {
+    | [|head|] => {
         heap.queue := [||];
-        min;
+        head;
     }
     | q => {
         let heap_size = Array.length(q);
@@ -102,7 +102,7 @@ let add = (key, value, heap) => {
     heap.queue := queue;
 }
 
-let min = heap => {
+let head = heap => {
     switch heap.queue^ {
     | [||] => raise(EmptyQueue)
     | q => Array.get(q, 0)
