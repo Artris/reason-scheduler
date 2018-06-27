@@ -60,9 +60,19 @@ let liveIDs: list(int) = [];
 let remove = (scheduler, id) => {
   let matchID = (someID) => someID == id;
   let foundID = List.find(matchID, liveIDs); /* todo: throw exception if id not found */
+  
   let heap = scheduler.queue;
+  let queue = Heap.getQueue(heap); /* ref to heap */
 
-  let queue = Heap.getQueue(heap);
+  let xStart = 0;
+  let xEnd = Array.length(queue^);
+
+  for (index in xStart to xEnd) {
+    let job = Array.get(queue^, index).value;
+    if (job.id == id) {
+      Heap.remove(index, heap);
+    }
+  };
 
   /* todo: remove job from list without disturbing min_heap property */
 }
