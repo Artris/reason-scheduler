@@ -52,14 +52,16 @@ let rec execute = scheduler => () => {
 exception TimerIsMissing;
 
 let idCounter = ref(0);
-let liveIDSet: list(int) = [];
+let liveIDs: list(int) = [];
 
-let remove = (id) => {
+let remove = (scheduler, id) => {
+  let queue = scheduler.queue;
+  /* let list = Array.to_list(queue.queue^); */
 };
 
 let add = (scheduler, job) => {
 
-  let liveIDSet = [idCounter^, ...liveIDSet];
+  let liveIDs = [idCounter^, ...liveIDs];
   job.id = idCounter^;
   idCounter := idCounter^ + 1;
 
