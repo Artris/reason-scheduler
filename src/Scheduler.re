@@ -54,7 +54,13 @@ exception TimerIsMissing;
 let idCounter = ref(0);
 let liveIDs: list(int) = [];
 
+
 let remove = (scheduler, id) => {
+  let exists = a => a == id;
+  let foundID: int = List.find(exists , liveIDs);
+
+  /* if (foundID) =  */
+
   let queue = scheduler.queue;
   /* let list = Array.to_list(queue.queue^); */
 };
