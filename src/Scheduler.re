@@ -57,7 +57,7 @@ let liveIDs: list(int) = [];
 
 let remove = (scheduler, id) => {
   let exists = a => a == id;
-  let foundID: int = List.find(exists , liveIDs);
+  let foundID: int = List.find(exists , liveIDs); /* Empty case, Deesn't exist*/
 
   /* if (foundID) =  */
 

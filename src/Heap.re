@@ -102,6 +102,23 @@ let add = (key, value, heap) => {
     heap.queue := queue;
 }
 
+
+let remove = (id, heap) => {
+    let queue = heap.queue^;
+
+    let xStart = 0;
+    let xEnd = Array.length(queue);
+
+    for (x in xStart to xEnd) {
+
+    };
+
+/*    let value = Array.get(queue, index).value;
+*/
+}
+
+
+
 let head = heap => {
     switch heap.queue^ {
     | [||] => raise(EmptyQueue)
@@ -121,6 +138,9 @@ let update_priority = (index, new_priority, heap) => {
         heapify(index, heap.compare, queue)
     }
 }
+
+
+
 
 exception HasHigherPriority;
 
