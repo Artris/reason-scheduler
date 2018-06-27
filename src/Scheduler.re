@@ -51,19 +51,21 @@ let rec execute = scheduler => () => {
 
 exception TimerIsMissing;
 
+exception IDDoesNotExist;
+
 let idCounter = ref(0);
 let liveIDs: list(int) = [];
 
 
 let remove = (scheduler, id) => {
-  let exists = a => a == id;
-  let foundID: int = List.find(exists , liveIDs); /* Empty case, Deesn't exist*/
+  let matchID = (someID) => someID == id;
+  let foundID = List.find(matchID, liveIDs); /* todo: throw exception if id not found */
+  let heap = scheduler.queue;
 
-  /* if (foundID) =  */
+  let queue = Heap.getQueue(heap);
 
-  let queue = scheduler.queue;
-  /* let list = Array.to_list(queue.queue^); */
-};
+  /* todo: remove job from list without disturbing min_heap property */
+}
 
 let add = (scheduler, job) => {
 

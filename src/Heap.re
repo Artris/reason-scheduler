@@ -103,19 +103,26 @@ let add = (key, value, heap) => {
 }
 
 
-let remove = (id, heap) => {
+let getQueue(heap) {
+    heap.queue;
+}
+
+/* let remove = (id, heap) => {
     let queue = heap.queue^;
 
     let xStart = 0;
     let xEnd = Array.length(queue);
 
-    for (x in xStart to xEnd) {
-
+    for (index in xStart to xEnd) {
+        /* if (Array.get(queue, index).value.id == id) {
+            
+        } */
+        let job: Scheduler.job = Array.get(queue, index).value;
     };
 
 /*    let value = Array.get(queue, index).value;
 */
-}
+} */
 
 
 
