@@ -11,6 +11,7 @@ describe("Scheduler", () => {
         let counter = ref(0);
         let job: Scheduler.job = {
             period: recurrence,
+            id: 42,
             invoke: () => { counter := counter^ + 1 }
         };
         Scheduler.add(scheduler, job);

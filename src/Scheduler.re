@@ -15,6 +15,7 @@ type recurrence =
 
 type job = {
     period: recurrence,
+    mutable id: int,
     invoke: unit => unit
 };
 
@@ -50,7 +51,18 @@ let rec execute = scheduler => () => {
 
 exception TimerIsMissing;
 
+let idCounter = ref(0);
+let liveIDSet: list(int) = [];
+
+let remove = (id) => {
+};
+
 let add = (scheduler, job) => {
+
+  let liveIDSet = [idCounter^, ...liveIDSet];
+  job.id = idCounter^;
+  idCounter := idCounter^ + 1;
+
   let queue = scheduler.queue;
   let queue_size = Heap.size(queue);
   let next_invocation = next_invocation(job);
