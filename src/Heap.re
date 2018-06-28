@@ -160,3 +160,5 @@ let decrease_root_priority = (new_priority, heap) => {
 let size = heap => Array.length(heap.queue^);
 
 let inspect = heap => Js.Array.toString(heap.queue^);
+
+let print = heap => Js.log(heap.queue^);

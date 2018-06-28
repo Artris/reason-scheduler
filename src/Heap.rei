@@ -15,3 +15,4 @@ let decrease_root_priority: ('a, t('a, 'b)) => unit
 let inspect: t('a, 'b) => string;
 let getQueue: t('a, 'b) => ref(array(heapElement('a, 'b)));
 let remove: (int, t('a, 'b)) => unit;
+let print: t('a, 'b) => unit;
