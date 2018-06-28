@@ -93,6 +93,7 @@ let extract = heap => {
     };
 }
 
+
 let add = (key, value, heap) => {
     let queue = switch heap.queue^ {
     | [||] => [|{key, value}|]
@@ -100,6 +101,24 @@ let add = (key, value, heap) => {
     };
     fix_last(heap.compare, queue);
     heap.queue := queue;
+}
+
+let remove = (index, heap) => {
+    let removedJob = Array.get(heap.queue^, index);
+    
+    let q = heap.queue^;
+    let heap_size = Array.length(q);
+
+    swap(index, heap_size - 1, q);
+    let q = Array.sub(q, 0, heap_size - 1);
+    heapify(index, heap.compare, q);
+    heap.queue := q;
+
+}
+
+
+let getQueue(heap) { /* delete this if Scheduler.re can directly access heap.queue */
+    heap.queue;
 }
 
 let head = heap => {
@@ -122,6 +141,9 @@ let update_priority = (index, new_priority, heap) => {
     }
 }
 
+
+
+
 exception HasHigherPriority;
 
 let decrease_root_priority = (new_priority, heap) => {
@@ -138,3 +160,5 @@ let decrease_root_priority = (new_priority, heap) => {
 let size = heap => Array.length(heap.queue^);
 
 let inspect = heap => Js.Array.toString(heap.queue^);
+
+let print = heap => Js.log(heap.queue^);
