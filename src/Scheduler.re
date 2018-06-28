@@ -62,7 +62,7 @@ let remove = (scheduler, id) => {
   let foundID = List.find(matchID, liveIDs); /* todo: throw exception if id not found */
   
   let heap = scheduler.queue;
-  let queue = Heap.getQueue(heap); /* ref to heap */
+  let queue = Heap.getQueue(heap);
 
   let xStart = 0;
   let xEnd = Array.length(queue^);
@@ -74,7 +74,6 @@ let remove = (scheduler, id) => {
     }
   };
 
-  /* todo: remove job from list without disturbing min_heap property */
 }
 
 let add = (scheduler, job) => {

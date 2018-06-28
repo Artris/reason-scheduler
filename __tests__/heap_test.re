@@ -27,4 +27,5 @@ describe("Heap", () => {
         expect((e1, e2, e3, e4, e5, e6, e7, e8, e9)) |> toEqual(
             ("1", "2", "3", "4", "5", "6", "7", "8", "9"));
     });
+    /* heap remove test goes here */
 });
