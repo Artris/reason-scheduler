@@ -13,3 +13,4 @@ let head: t('a, 'b) => heapElement('a, 'b);
 let size: t('a, 'b) => int;
 let decrease_root_priority: ('a, t('a, 'b)) => unit
 let inspect: t('a, 'b) => string;
+let remove: (('b) => bool, t('a, 'b)) => unit;

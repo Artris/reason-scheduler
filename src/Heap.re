@@ -93,6 +93,7 @@ let extract = heap => {
     };
 }
 
+
 let add = (key, value, heap) => {
     let queue = switch heap.queue^ {
     | [||] => [|{key, value}|]
@@ -100,6 +101,29 @@ let add = (key, value, heap) => {
     };
     fix_last(heap.compare, queue);
     heap.queue := queue;
+}
+
+
+
+let remove = (match, heap) => {
+    let q = heap.queue^;
+    let start = 0;
+    let heap_size = Array.length(q);
+    
+    let index = ref(0);
+    for (i in start to heap_size) {
+      let heapElem = Array.get(q, i).value;
+      if (match(heapElem)) {
+        swap(i, heap_size - 1, q);
+        index := i;
+      }
+    };
+
+    let index = index^;
+
+    let q = Array.sub(q, 0, heap_size - 1);
+    heapify(index, heap.compare, q);
+    heap.queue := q; 
 }
 
 let head = heap => {
@@ -121,6 +145,9 @@ let update_priority = (index, new_priority, heap) => {
         heapify(index, heap.compare, queue)
     }
 }
+
+
+
 
 exception HasHigherPriority;
 
