@@ -105,21 +105,28 @@ let add = (key, value, heap) => {
 let remove = (match, heap) => {
     let q = heap.queue^;
     let heap_size = Array.length(q);
-    let index = 0;
-    let i = ref(0);
-
-    while (i^ < heap_size) {
-        let value = Array.get(q, i^).value;
-        if (match(value)) {
-            swap(i^, heap_size - 1, q);
-            let index = i^;
-            i := heap_size;     /* break */
+    let index = ref(0);
+    
+    let rec repeat = i => {
+        switch i {
+        | ind when (ind == heap_size) => ();
+        | _ => {
+            let value = Array.get(q, i).value;
+            if (match(value)) {
+                swap(i, heap_size - 1, q);
+                index := i;
+            }
+            else {
+                repeat(i + 1);
+            }    
         };
-        i := i^ + 1;
+        };
     };
 
+    repeat(0);
+    
     let q = Array.sub(q, 0, heap_size - 1);
-    heapify(index, heap.compare, q);
+    heapify(index^, heap.compare, q);
     heap.queue := q; 
 }
 
