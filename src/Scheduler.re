@@ -56,24 +56,16 @@ exception IDDoesNotExist;
 let idCounter = ref(0);
 let liveIDs: list(int) = [];
 
+let matchJobId = (id, job) => job.id == id;
 
 let remove = (scheduler, id) => {
-  let matchID = (someID) => someID == id;
-  let foundID = List.find(matchID, liveIDs); /* todo: throw exception if id not found */
   
+  let matchID = (someID) => someID == id;
+  let foundID = List.find(matchID, liveIDs); /* test if this raises notFound in negative case */
+
   let heap = scheduler.queue;
-  let queue = Heap.getQueue(heap);
-
-  let xStart = 0;
-  let xEnd = Array.length(queue^);
-
-  for (index in xStart to xEnd) {
-    let job = Array.get(queue^, index).value;
-    if (job.id == id) {
-      Heap.remove(index, heap);
-    }
-  };
-
+  let matchJobId = matchJobId(id);
+  Heap.remove(matchJobId, heap);
 }
 
 let add = (scheduler, job) => {

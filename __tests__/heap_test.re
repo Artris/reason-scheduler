@@ -39,12 +39,17 @@ describe("Heap", () => {
         Heap.add(5, "5", heap);
         Heap.add(4, "4", heap);
         
+        let match = (x, heapElem) => heapElem == x;
+
         /* Heap.print(heap); */
-        Heap.remove(0, heap);
+        let match0 = match("0");
+        Heap.remove(match0, heap);
         /* Heap.print(heap); */
-        Heap.remove(7, heap);
+        let match7 = match("7");
+        Heap.remove(match7, heap);
         /* Heap.print(heap); */
-        Heap.remove(3, heap);
+        let match3 = match("3");
+        Heap.remove(match3, heap);
         /* Heap.print(heap); */
 
         /* let {value: e1}: Heap.heapElement(int, string) = Heap.extract(heap); */

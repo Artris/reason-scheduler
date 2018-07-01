@@ -14,3 +14,4 @@ type t;
 
 let create: unit => t;
 let add: (t, job) => unit;
+let remove: (t, int) => unit;
