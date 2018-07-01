@@ -102,6 +102,27 @@ let add = (key, value, heap) => {
     heap.queue := queue;
 }
 
+let remove = (match, heap) => {
+    let q = heap.queue^;
+    let heap_size = Array.length(q);
+    let index = 0;
+    let i = ref(0);
+
+    while (i^ < heap_size) {
+        let value = Array.get(q, i^).value;
+        if (match(value)) {
+            swap(i^, heap_size - 1, q);
+            let index = i^;
+            i := heap_size;     /* break */
+        };
+        i := i^ + 1;
+    };
+
+    let q = Array.sub(q, 0, heap_size - 1);
+    heapify(index, heap.compare, q);
+    heap.queue := q; 
+}
+
 let head = heap => {
     switch heap.queue^ {
     | [||] => raise(EmptyQueue)
