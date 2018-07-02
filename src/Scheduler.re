@@ -22,7 +22,7 @@ type jobId = int;
 
 type internalJobRep = {
   period: recurrence,
-  mutable id: jobId,
+  id: jobId,
   invoke: unit => unit
 };
 
