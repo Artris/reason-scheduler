@@ -13,6 +13,7 @@ describe("Scheduler", () => {
             period: recurrence,
             invoke: () => { counter := counter^ + 1 }
         };
+
         Scheduler.add(scheduler, job) |> ignore;
 
         let promise = Js.Promise.make((~resolve, ~reject) => {
@@ -25,6 +26,7 @@ describe("Scheduler", () => {
               Js.Promise.resolve(assertion);
             });
     });
+
 
     testPromise("remove", () => {
         let scheduler = Scheduler.create();
