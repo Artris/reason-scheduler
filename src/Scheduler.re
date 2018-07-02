@@ -14,12 +14,20 @@ type recurrence =
   | Hour(int);
 
 type job = {
-    period: recurrence,
-    invoke: unit => unit
+  period: recurrence,
+  invoke: unit => unit
+};
+
+type jobId = int;
+
+type internalJobRep = {
+  period: recurrence,
+  mutable id: jobId,
+  invoke: unit => unit
 };
 
 type t = {
-  queue: Heap.t(long, job),
+  queue: Heap.t(long, internalJobRep),
   timer_id: ref(option(timerId))
 };
 
@@ -50,7 +58,48 @@ let rec execute = scheduler => () => {
 
 exception TimerIsMissing;
 
-let add = (scheduler, job) => {
+let updateTimer_id = (scheduler, job) => {
+  let timer_id = switch scheduler.timer_id^ {
+    | None => raise(TimerIsMissing)
+    | Some(id) => id
+    };
+    clearTimeout(timer_id);
+    let wait = wait(job.period);
+    let timer_id = setTimeout(execute(scheduler), wait);
+    scheduler.timer_id := Some(timer_id);
+}
+
+let idCounter = ref(0);
+
+let liveIDs: ref(list(int)) = ref([]);
+
+let remove = (scheduler, jobId) => {
+  let matchID = someID => someID == jobId;
+  List.find(matchID, liveIDs^) |> ignore;
+  liveIDs := ListLabels.filter(x => x != jobId, liveIDs^);
+
+  let heap = scheduler.queue;
+  let oldHeadJob = Heap.head(heap).value;
+
+  let matchJobId = job => job.id == jobId;
+  Heap.remove(matchJobId, heap);
+  let newHeadJob = Heap.head(heap).value;
+
+  if (newHeadJob != oldHeadJob) {
+    updateTimer_id(scheduler, newHeadJob);
+  }
+}
+
+let add = (scheduler, j: job) => {
+  let job: internalJobRep = {
+    period: j.period,
+    id: idCounter^,
+    invoke: j.invoke
+  };
+
+  liveIDs := [idCounter^, ...liveIDs^];
+  idCounter := idCounter^ + 1;
+
   let queue = scheduler.queue;
   let queue_size = Heap.size(queue);
   let next_invocation = next_invocation(job);
@@ -64,18 +113,11 @@ let add = (scheduler, job) => {
     let key = Heap.head(scheduler.queue).key;
     Heap.add(next_invocation, job, queue);
     if(has_higher_priority(next_invocation, key)){
-      let timer_id = switch scheduler.timer_id^ {
-      | None => raise(TimerIsMissing)
-      | Some(id) => id
-      };
-      clearTimeout(timer_id);
-      let wait = wait(job.period);
-      let timer_id = setTimeout(execute(scheduler), wait);
-      scheduler.timer_id := Some(timer_id);
+      updateTimer_id(scheduler, job);
     }
   }
-  }
-
+  };
+  job.id;
 };
 
 let create = () => {
