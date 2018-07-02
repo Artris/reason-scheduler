@@ -13,7 +13,7 @@ describe("Scheduler", () => {
             period: recurrence,
             invoke: () => { counter := counter^ + 1 }
         };
-        Scheduler.add(scheduler, job);
+        Scheduler.add(scheduler, job) |> ignore;
 
         let promise = Js.Promise.make((~resolve, ~reject) => {
             let _ = setTimeout(() => resolve(. counter^), 4100);

@@ -60,32 +60,42 @@ let rec execute = scheduler => () => {
 
 exception TimerIsMissing;
 
-let updateTimer_id = (scheduler, job) => {
+let clearTimer = scheduler => {
   let timer_id = switch scheduler.timer_id^ {
     | None => raise(TimerIsMissing)
     | Some(id) => id
     };
     clearTimeout(timer_id);
-    let wait = wait(job.period);
-    let timer_id = setTimeout(execute(scheduler), wait);
-    scheduler.timer_id := Some(timer_id);
+}
+
+let updateTimer = (scheduler, job) => {
+  clearTimer(scheduler);
+  let wait = wait(job.period);
+  let timer_id = setTimeout(execute(scheduler), wait);
+  scheduler.timer_id := Some(timer_id);
 }
 
 let remove = (scheduler, jobId) => {
   let match_id = some_id => some_id == jobId;
   List.find(match_id, scheduler.live_ids^) |> ignore;
-  scheduler.live_ids := ListLabels.filter(x => x != jobId, scheduler.live_ids^);
+  scheduler.live_ids := List.filter(x => x != jobId, scheduler.live_ids^);
 
   let heap = scheduler.queue;
   let oldHeadJob = Heap.head(heap).value;
 
   let matchJobId = job => job.id == jobId;
   Heap.remove(matchJobId, heap);
-  let newHeadJob = Heap.head(heap).value;
+  
+  let () = switch (Heap.size(heap)) {
+  | 0 => clearTimer(scheduler);
+  | _ => {
+    let newHeadJob = Heap.head(heap).value;
 
-  if (newHeadJob != oldHeadJob) {
-    updateTimer_id(scheduler, newHeadJob);
+    if (newHeadJob != oldHeadJob) {
+      updateTimer(scheduler, newHeadJob);
+    }
   }
+  };
 }
 
 let add = (scheduler, j: job) => {
@@ -111,7 +121,7 @@ let add = (scheduler, j: job) => {
     let key = Heap.head(scheduler.queue).key;
     Heap.add(next_invocation, job, queue);
     if(has_higher_priority(next_invocation, key)){
-      updateTimer_id(scheduler, job);
+      updateTimer(scheduler, job);
     }
   }
   };
