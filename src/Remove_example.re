@@ -7,11 +7,11 @@ let job_1: Scheduler.job = {
 }
 
 let scheduler = Scheduler.create();
-let jobId = Scheduler.add(scheduler, job_1);
+let job_id = Scheduler.add(scheduler, job_1);
 
 
 
 let remove = () => {
-    Scheduler.remove(scheduler, jobId);
+    Scheduler.remove(scheduler, job_id);
 };
 setTimeout(remove, 8200);

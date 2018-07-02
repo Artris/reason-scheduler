@@ -75,11 +75,11 @@ let updateTimer = (scheduler, job) => {
   scheduler.timer_id := Some(timer_id);
 }
 
-exception NoActiveJobWithId(int);
+exception NoActiveJobWithId(jobId);
 
 let remove = (scheduler, jobId) => {
-  let match_id = some_id => some_id == jobId;
-  let () = switch (List.find(match_id, scheduler.live_ids^)) {
+  let match_job_id = some_id => some_id == jobId;
+  let () = switch (List.find(match_job_id, scheduler.live_ids^)) {
   | exception Not_found => raise(NoActiveJobWithId(jobId));
   | _ => ();
   };
@@ -87,7 +87,7 @@ let remove = (scheduler, jobId) => {
   scheduler.live_ids := List.filter(x => x != jobId, scheduler.live_ids^);
 
   let heap = scheduler.queue;
-  let oldHeadJob = Heap.head(heap).value;
+  let old_head_job = Heap.head(heap).value;
 
   let matchJobId = job => job.id == jobId;
   Heap.remove(matchJobId, heap);
@@ -95,10 +95,10 @@ let remove = (scheduler, jobId) => {
   let () = switch (Heap.size(heap)) {
   | 0 => clearTimer(scheduler);
   | _ => {
-    let newHeadJob = Heap.head(heap).value;
+    let new_head_job = Heap.head(heap).value;
 
-    if (newHeadJob != oldHeadJob) {
-      updateTimer(scheduler, newHeadJob);
+    if (new_head_job != old_head_job) {
+      updateTimer(scheduler, new_head_job);
     }
   }
   };

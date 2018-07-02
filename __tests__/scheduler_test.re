@@ -34,9 +34,9 @@ describe("Scheduler", () => {
             period: recurrence,
             invoke: () => { counter := counter^ + 1 }
         };
-        let jobId = Scheduler.add(scheduler, job);
+        let job_id = Scheduler.add(scheduler, job);
 
-        setTimeout(() => Scheduler.remove(scheduler, jobId), 2100) |> ignore;
+        setTimeout(() => Scheduler.remove(scheduler, job_id), 2100) |> ignore;
 
         let promise = Js.Promise.make((~resolve, ~reject) => {
             let _ = setTimeout(() => resolve(. counter^), 4100);

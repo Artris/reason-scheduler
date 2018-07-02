@@ -11,7 +11,7 @@ type job = {
 type jobId;
 
 exception TimerIsMissing;
-exception NoActiveJobWithId(int);
+exception NoActiveJobWithId(jobId);
 
 type t;
 
