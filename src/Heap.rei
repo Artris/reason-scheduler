@@ -8,6 +8,7 @@ exception HasHigherPriority;
 
 let create: (('a, 'a) => bool) => t('a, 'b);
 let add: ('a, 'b, t('a, 'b)) => unit;
+let remove: (('b) => bool, t('a, 'b)) => unit;
 let extract: t('a, 'b) => heapElement('a, 'b);
 let head: t('a, 'b) => heapElement('a, 'b);
 let size: t('a, 'b) => int;

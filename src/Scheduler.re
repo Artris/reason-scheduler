@@ -14,13 +14,23 @@ type recurrence =
   | Hour(int);
 
 type job = {
-    period: recurrence,
-    invoke: unit => unit
+  period: recurrence,
+  invoke: unit => unit
+};
+
+type jobId = int;
+
+type internalJobRep = {
+  period: recurrence,
+  id: jobId,
+  invoke: unit => unit
 };
 
 type t = {
-  queue: Heap.t(long, job),
-  timer_id: ref(option(timerId))
+  queue: Heap.t(long, internalJobRep),
+  timer_id: ref(option(timerId)),
+  id_counter: ref(int),
+  live_ids: ref(list(int))
 };
 
 let wait = period => {
@@ -50,7 +60,60 @@ let rec execute = scheduler => () => {
 
 exception TimerIsMissing;
 
-let add = (scheduler, job) => {
+let clearTimer = scheduler => {
+  let timer_id = switch scheduler.timer_id^ {
+    | None => raise(TimerIsMissing)
+    | Some(id) => id
+    };
+    clearTimeout(timer_id);
+}
+
+let updateTimer = (scheduler, job) => {
+  clearTimer(scheduler);
+  let wait = wait(job.period);
+  let timer_id = setTimeout(execute(scheduler), wait);
+  scheduler.timer_id := Some(timer_id);
+}
+
+exception NoActiveJobWithId(int);
+
+let remove = (scheduler, jobId) => {
+  let match_id = some_id => some_id == jobId;
+  let () = switch (List.find(match_id, scheduler.live_ids^)) {
+  | exception Not_found => raise(NoActiveJobWithId(jobId));
+  | _ => ();
+  };
+
+  scheduler.live_ids := List.filter(x => x != jobId, scheduler.live_ids^);
+
+  let heap = scheduler.queue;
+  let oldHeadJob = Heap.head(heap).value;
+
+  let matchJobId = job => job.id == jobId;
+  Heap.remove(matchJobId, heap);
+  
+  let () = switch (Heap.size(heap)) {
+  | 0 => clearTimer(scheduler);
+  | _ => {
+    let newHeadJob = Heap.head(heap).value;
+
+    if (newHeadJob != oldHeadJob) {
+      updateTimer(scheduler, newHeadJob);
+    }
+  }
+  };
+}
+
+let add = (scheduler, j: job) => {
+  let job: internalJobRep = {
+    period: j.period,
+    id: scheduler.id_counter^,
+    invoke: j.invoke
+  };
+
+  scheduler.live_ids := [scheduler.id_counter^, ...scheduler.live_ids^];
+  scheduler.id_counter := scheduler.id_counter^ + 1;
+
   let queue = scheduler.queue;
   let queue_size = Heap.size(queue);
   let next_invocation = next_invocation(job);
@@ -64,21 +127,16 @@ let add = (scheduler, job) => {
     let key = Heap.head(scheduler.queue).key;
     Heap.add(next_invocation, job, queue);
     if(has_higher_priority(next_invocation, key)){
-      let timer_id = switch scheduler.timer_id^ {
-      | None => raise(TimerIsMissing)
-      | Some(id) => id
-      };
-      clearTimeout(timer_id);
-      let wait = wait(job.period);
-      let timer_id = setTimeout(execute(scheduler), wait);
-      scheduler.timer_id := Some(timer_id);
+      updateTimer(scheduler, job);
     }
   }
-  }
-
+  };
+  job.id;
 };
 
 let create = () => {
   queue: Heap.create(has_higher_priority),
-  timer_id: ref(None)
+  timer_id: ref(None),
+  id_counter: ref(0),
+  live_ids: ref([])
 };

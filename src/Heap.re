@@ -102,6 +102,41 @@ let add = (key, value, heap) => {
     heap.queue := queue;
 }
 
+let search = (match, heap) => {
+    let q = heap.queue^;
+    let heap_size = Array.length(q);
+
+    let rec checkSuffix = ind => {
+        switch ind {
+        | ind when (ind == heap_size) => None;
+        | _ => {
+            let value = Array.get(q, ind).value;
+            if (match(value)) {
+                Some(ind);
+            } else {
+                checkSuffix(ind + 1);    
+            };
+        };
+        };
+    };
+    checkSuffix(0);
+};
+
+let remove = (match, heap) => {
+    let index = search(match, heap);
+    let q = heap.queue^;
+    let heap_size = Array.length(q);
+    switch index {
+    | None => ();
+    | Some(index) => {
+        swap(index, heap_size - 1, q);
+        let q = Array.sub(q, 0, heap_size - 1);
+        heapify(index, heap.compare, q);
+        heap.queue := q; 
+    }
+    };
+};
+
 let head = heap => {
     switch heap.queue^ {
     | [||] => raise(EmptyQueue)
