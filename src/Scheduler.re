@@ -75,9 +75,15 @@ let updateTimer = (scheduler, job) => {
   scheduler.timer_id := Some(timer_id);
 }
 
+exception NoActiveJobWithId(int);
+
 let remove = (scheduler, jobId) => {
   let match_id = some_id => some_id == jobId;
-  List.find(match_id, scheduler.live_ids^) |> ignore;
+  let () = switch (List.find(match_id, scheduler.live_ids^)) {
+  | exception Not_found => raise(NoActiveJobWithId(jobId));
+  | _ => ();
+  };
+
   scheduler.live_ids := List.filter(x => x != jobId, scheduler.live_ids^);
 
   let heap = scheduler.queue;
