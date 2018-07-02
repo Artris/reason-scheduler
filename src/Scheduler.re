@@ -28,7 +28,9 @@ type internalJobRep = {
 
 type t = {
   queue: Heap.t(long, internalJobRep),
-  timer_id: ref(option(timerId))
+  timer_id: ref(option(timerId)),
+  id_counter: ref(int),
+  live_ids: ref(list(int))
 };
 
 let wait = period => {
@@ -69,14 +71,10 @@ let updateTimer_id = (scheduler, job) => {
     scheduler.timer_id := Some(timer_id);
 }
 
-let idCounter = ref(0);
-
-let liveIDs: ref(list(int)) = ref([]);
-
 let remove = (scheduler, jobId) => {
-  let matchID = someID => someID == jobId;
-  List.find(matchID, liveIDs^) |> ignore;
-  liveIDs := ListLabels.filter(x => x != jobId, liveIDs^);
+  let match_id = some_id => some_id == jobId;
+  List.find(match_id, scheduler.live_ids^) |> ignore;
+  scheduler.live_ids := ListLabels.filter(x => x != jobId, scheduler.live_ids^);
 
   let heap = scheduler.queue;
   let oldHeadJob = Heap.head(heap).value;
@@ -93,12 +91,12 @@ let remove = (scheduler, jobId) => {
 let add = (scheduler, j: job) => {
   let job: internalJobRep = {
     period: j.period,
-    id: idCounter^,
+    id: scheduler.id_counter^,
     invoke: j.invoke
   };
 
-  liveIDs := [idCounter^, ...liveIDs^];
-  idCounter := idCounter^ + 1;
+  scheduler.live_ids := [scheduler.id_counter^, ...scheduler.live_ids^];
+  scheduler.id_counter := scheduler.id_counter^ + 1;
 
   let queue = scheduler.queue;
   let queue_size = Heap.size(queue);
@@ -122,5 +120,7 @@ let add = (scheduler, j: job) => {
 
 let create = () => {
   queue: Heap.create(has_higher_priority),
-  timer_id: ref(None)
+  timer_id: ref(None),
+  id_counter: ref(0),
+  live_ids: ref([])
 };
