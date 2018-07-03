@@ -5,6 +5,7 @@ type heapElement('a, 'b) = {
 type t('a, 'b);
 exception EmptyQueue;
 exception HasHigherPriority;
+exception RemoveElementNotFound;
 
 let create: (('a, 'a) => bool) => t('a, 'b);
 let add: ('a, 'b, t('a, 'b)) => unit;

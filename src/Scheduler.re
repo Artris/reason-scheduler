@@ -29,8 +29,7 @@ type internalJobRep = {
 type t = {
   queue: Heap.t(long, internalJobRep),
   timer_id: ref(option(timerId)),
-  id_counter: ref(int),
-  live_ids: ref(list(int))
+  id_counter: ref(int)
 };
 
 let wait = period => {
@@ -77,32 +76,26 @@ let updateTimer = (scheduler, job) => {
 
 exception NoActiveJobWithId(jobId);
 
-let remove = (scheduler, jobId) => {
-  let match_job_id = some_id => some_id == jobId;
-  let () = switch (List.find(match_job_id, scheduler.live_ids^)) {
-  | exception Not_found => raise(NoActiveJobWithId(jobId));
-  | _ => ();
-  };
-
-  scheduler.live_ids := List.filter(x => x != jobId, scheduler.live_ids^);
-
+  let remove = (scheduler, jobId) => {
   let heap = scheduler.queue;
   let old_head_job = Heap.head(heap).value;
 
-  let matchJobId = job => job.id == jobId;
-  Heap.remove(matchJobId, heap);
+  let match_job_id = job => job.id == jobId;
+  switch (Heap.remove(match_job_id, heap)) {
+  | exception Heap.RemoveElementNotFound => raise(NoActiveJobWithId(jobId));
+  | _ => ();
+  };
   
-  let () = switch (Heap.size(heap)) {
+  switch (Heap.size(heap)) {
   | 0 => clearTimer(scheduler);
-  | _ => {
+  | _ => ()
     let new_head_job = Heap.head(heap).value;
-
     if (new_head_job != old_head_job) {
       updateTimer(scheduler, new_head_job);
     }
   }
-  };
 }
+
 
 let add = (scheduler, j: job) => {
   let job: internalJobRep = {
@@ -111,9 +104,7 @@ let add = (scheduler, j: job) => {
     invoke: j.invoke
   };
 
-  scheduler.live_ids := [scheduler.id_counter^, ...scheduler.live_ids^];
   scheduler.id_counter := scheduler.id_counter^ + 1;
-
   let queue = scheduler.queue;
   let queue_size = Heap.size(queue);
   let next_invocation = next_invocation(job);
@@ -137,6 +128,5 @@ let add = (scheduler, j: job) => {
 let create = () => {
   queue: Heap.create(has_higher_priority),
   timer_id: ref(None),
-  id_counter: ref(0),
-  live_ids: ref([])
+  id_counter: ref(0)
 };
