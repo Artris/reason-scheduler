@@ -18,3 +18,4 @@ type t;
 let create: unit => t;
 let add: (t, job) => jobId;
 let remove: (t, jobId) => unit;
+let reschedule: (t, job, jobId) => jobId;
