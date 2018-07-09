@@ -3,8 +3,6 @@ type heapElement('a, 'b) = {
     value: 'b
 }
 type t('a, 'b);
-exception EmptyQueue;
-exception HasHigherPriority;
 
 let create: (('a, 'a) => bool) => t('a, 'b);
 let add: ('a, 'b, t('a, 'b)) => unit;
