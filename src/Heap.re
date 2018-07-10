@@ -122,12 +122,14 @@ let search = (match, heap) => {
     checkSuffix(0);
 };
 
+exception RemoveElementNotFound;
+
 let remove = (match, heap) => {
     let index = search(match, heap);
     let q = heap.queue^;
     let heap_size = Array.length(q);
     switch index {
-    | None => ();
+    | None => raise(RemoveElementNotFound);
     | Some(index) => {
         swap(index, heap_size - 1, q);
         let q = Array.sub(q, 0, heap_size - 1);
