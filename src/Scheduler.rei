@@ -9,10 +9,6 @@ type job = {
 };
 
 type jobId;
-
-exception TimerIsMissing;
-exception NoActiveJobWithId(jobId);
-
 type t;
 
 let create: unit => t;

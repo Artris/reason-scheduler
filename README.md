@@ -1,18 +1,4 @@
 # Reason Schedule
-A scheduler in ReasonML
+A scheduler in [ReasonML](https://reasonml.github.io/) that uses a single timer at all time.
 
-## Build
-```
-npm run build
-```
-
-## Build + Watch
-
-```
-npm run start
-```
-
-## Test
-```
-npm run test
-```
+Inspired by the [Node Schedule](https://github.com/node-schedule/node-schedule).

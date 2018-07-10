@@ -3,8 +3,7 @@ type heapElement('a, 'b) = {
     value: 'b
 }
 type t('a, 'b);
-exception EmptyQueue;
-exception HasHigherPriority;
+
 exception RemoveElementNotFound;
 
 let create: (('a, 'a) => bool) => t('a, 'b);
