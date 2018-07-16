@@ -126,6 +126,11 @@ let add = (scheduler, j: job) => {
   job.id;
 };
 
+let reschedule = (scheduler, j: job , jobId) =>{
+  remove(scheduler, jobId);
+  add(scheduler, j);
+};
+
 let create = () => {
   queue: Heap.create(has_higher_priority),
   timer_id: ref(None),
