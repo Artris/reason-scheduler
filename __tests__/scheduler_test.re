@@ -7,7 +7,7 @@ type timerId;
 describe("Scheduler", () => {  
     testPromise("add", () => {
         let scheduler = Scheduler.create();
-        let recurrence = Scheduler.Second(1);
+        let recurrence = Scheduler.Millisecond(500);
         let counter = ref(0);
         let job: Scheduler.job = {
             period: recurrence,
@@ -16,7 +16,7 @@ describe("Scheduler", () => {
         Scheduler.add(scheduler, job) |> ignore;
 
         let promise = Js.Promise.make((~resolve, ~reject) => {
-            let _ = setTimeout(() => resolve(. counter^), 4100);
+            let _ = setTimeout(() => resolve(. counter^), 2100);
         });
 
         promise
@@ -32,20 +32,20 @@ describe("Scheduler", () => {
         let counter_1 = ref(0);
         let counter_2 = ref(0);
         let job_1: Scheduler.job = {
-            period: Second(1),
+            period: Millisecond(500),
             invoke: () => { counter_1 := counter_1^ + 1 }
         }
         let job_2: Scheduler.job = {
-            period: Second(3),
+            period: Millisecond(1500),
             invoke: () => { counter_2 := counter_2^ + 1 }
         }
         let scheduler = Scheduler.create();
         let job_1_id = Scheduler.add(scheduler, job_1);
         Scheduler.add(scheduler, job_2) |> ignore;
 
-        setTimeout(() => Scheduler.remove(scheduler, job_1_id), 1500) |> ignore;
+        setTimeout(() => Scheduler.remove(scheduler, job_1_id), 750) |> ignore;
         let promise = Js.Promise.make((~resolve, ~reject) => {
-            let _ = setTimeout(() => resolve(. (counter_1^, counter_2^)), 4900);
+            let _ = setTimeout(() => resolve(. (counter_1^, counter_2^)), 2500);
         });
 
         promise
@@ -62,15 +62,15 @@ describe("Scheduler", () => {
         let counter_2 = ref(0);
         let counter_3 = ref(0);
         let job_1: Scheduler.job = {
-            period: Second(1),
+            period: Millisecond(500),
             invoke: () => { counter_1 := counter_1^ + 1 }
         };
         let job_2: Scheduler.job = {
-            period: Second(2),
+            period: Second(1),
             invoke: () => { counter_2 := counter_2^ + 1 }
         };
         let job_3: Scheduler.job = {
-            period: Second(3),
+            period: Millisecond(2500),
             invoke: () => { counter_3 := counter_3^ + 1 }
         };
         
@@ -79,14 +79,14 @@ describe("Scheduler", () => {
         Scheduler.add(scheduler, job_3) |> ignore;
         let job_2_id = Scheduler.add(scheduler, job_2);
           
-        setTimeout(() => Scheduler.remove(scheduler, job_2_id), 2100) |> ignore;
+        setTimeout(() => Scheduler.remove(scheduler, job_2_id), 1100) |> ignore;
         let promise = Js.Promise.make((~resolve, ~reject) => {
             let _ = setTimeout(() => resolve(. (counter_1^, counter_2^, counter_3^)), 3100);
         });
 
         promise
         |> Js.Promise.then_(counters => {
-              let assertion = expect(counters) |> toEqual((3,1,1));
+              let assertion = expect(counters) |> toEqual((6,1,1));
               Js.Promise.resolve(assertion);
             });
     });
@@ -95,15 +95,15 @@ describe("Scheduler", () => {
     testPromise("removeSingle", () => {
         let counter = ref(0);
         let job_1: Scheduler.job = {
-            period: Second(1),
+            period: Millisecond(500),
             invoke: () => { counter := counter^ + 1 }
         }
         let scheduler = Scheduler.create();
         let job_1_id = Scheduler.add(scheduler, job_1);
 
-        setTimeout(() => Scheduler.remove(scheduler, job_1_id), 1100) |> ignore;
+        setTimeout(() => Scheduler.remove(scheduler, job_1_id), 600) |> ignore;
         let promise = Js.Promise.make((~resolve, ~reject) => {
-            let _ = setTimeout(() => resolve(. counter^), 3000);
+            let _ = setTimeout(() => resolve(. counter^), 1000);
         });
 
         promise

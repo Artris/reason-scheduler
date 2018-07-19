@@ -9,6 +9,7 @@ let subtract: (long, long) => int = [%raw "(a, b) => a - b"];
 let has_higher_priority: (long, long) => bool = [%raw "(a, b) => a < b"];
 
 type recurrence =
+  | Millisecond(int)
   | Second(int)
   | Minute(int)
   | Hour(int);
@@ -34,6 +35,7 @@ type t = {
 
 let wait = period => {
   switch period {
+    | Millisecond(ms) => ms
     | Second(s) => s * 1000
     | Minute(m) => m * 60 * 1000
     | Hour(h) => h * 60 * 60 * 1000
