@@ -26,9 +26,8 @@ describe("Scheduler", () => {
             });
     });
 
-    /* Removing the head job of the queue should result in a queue without the head element
-    and remaining jobs should function properly */
-    testPromise("removeHead", () => {
+    testPromise("Removing the head job of the queue should result in a queue without the head element
+    and remaining jobs should function properly", () => {
         let counter_1 = ref(0);
         let counter_2 = ref(0);
         let job_1: Scheduler.job = {
@@ -55,9 +54,8 @@ describe("Scheduler", () => {
             });
     });
 
-    /* Removing a job in the middle of the queue should result in a queue without said job 
-    and with all other jobs functioning properly*/
-    testPromise("removeMiddle", () => {
+    testPromise("Removing a job in the middle of the queue should result in a queue without said job 
+    and with all other jobs functioning properly", () => {
         let counter_1 = ref(0);
         let counter_2 = ref(0);
         let counter_3 = ref(0);
@@ -91,8 +89,7 @@ describe("Scheduler", () => {
             });
     });
     
-    /* Removing the only job in the queue should result in an empty queue */
-    testPromise("removeSingle", () => {
+    testPromise("Removing the only job in the queue should result in an empty queue", () => {
         let counter = ref(0);
         let job_1: Scheduler.job = {
             period: Millisecond(500),
