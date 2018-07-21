@@ -1,4 +1,5 @@
 type recurrence =
+  | Millisecond(int)
   | Second(int)
   | Minute(int)
   | Hour(int);
